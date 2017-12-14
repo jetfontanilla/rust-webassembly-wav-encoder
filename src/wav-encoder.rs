@@ -5,11 +5,11 @@ fn main() {
 }
 
 fn merge_buffers(buffers: &[[f32]], recording_length: usize) -> [f32] {
-    buffers.flat_map(|buffer| buffer.iter()).collect();
+    buffers.flat_map(|buffer| buffer.iter()).collect::<[f32]>();
 }
 
 fn interleave(left_buffer: &[f32], right_buffer: &[f32]) -> [f32] {
-    left_buffer.zip(right_buffer).collect();
+    left_buffer.zip(right_buffer).collect::<[f32]>();
 }
 
 fn encode_wav(buffer: &[f32]) -> [u16] {

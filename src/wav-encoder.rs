@@ -4,7 +4,7 @@ fn main() {
     println!("encoder loaded");
 }
 
-fn merge_buffers(buffers: &[[f32]], recording_length: i16) -> [f32] {
+fn merge_buffers(buffers: &[[f32]], recording_length: usize) -> [f32] {
     buffers.flat_map(|buffer| buffer.iter()).collect();
 }
 

@@ -4,22 +4,22 @@ fn main() {
     println!("encoder loaded");
 }
 
-fn merge_buffers(buffers: &[[f32]], recording_length: usize) -> [f32] {
-    buffers.flat_map(|buffer| buffer.iter()).collect::<[f32]>();
+fn merge_buffers(buffers: &Vec<[f32]>, recording_length: usize) -> Vec<f32> {
+    buffers.iter().flat_map(|buffer: [f32]| buffer).collect::<Vec<f32>>();
 }
 
-fn interleave(left_buffer: &[f32], right_buffer: &[f32]) -> [f32] {
-    left_buffer.zip(right_buffer).collect::<[f32]>();
+fn interleave(left_buffer: &Vec<f32>, right_buffer: &Vec<f32>) -> Vec<f32> {
+    left_buffer.zip(right_buffer).collect::<Vec<f32>>();
 }
 
-fn encode_wav(buffer: &[f32]) -> [u16] {
-    [];
+fn encode_wav(buffer: &Vec<f32>) -> Vec<u16> {
+    vec![];
 }
 
 #[no_mangle]
-pub fn export_wav(left_buffers: *mut [[f32]],
-                  right_buffers: *mut [[f32]],
-                  recording_length: usize) -> [u16] {
+pub fn export_wav(left_buffers: *mut Vec<[f32]>,
+                  right_buffers: *mut Vec<[f32]>,
+                  recording_length: usize) -> Vec<u16> {
     unsafe {
         let left_slice = slice::from_raw_parts(left_buffers, recording_length);
         let right_slice = slice::from_raw_parts(right_buffers, recording_length);

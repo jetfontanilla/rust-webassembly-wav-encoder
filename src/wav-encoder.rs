@@ -1,15 +1,16 @@
 use std::slice;
+use std::cmp;
 
 fn main() {
     println!("encoder loaded");
 }
 
 fn merge_buffers(buffers: &Vec<[f32]>, recording_length: usize) -> Vec<f32> {
-    buffers.iter().flat_map(|buffer: [f32]| buffer).collect::<Vec<f32>>();
+    buffers.iter().flat_map(|buffer: [f32]| buffer).collect::<Vec<f32>>()
 }
 
 fn interleave(left_buffer: &Vec<f32>, right_buffer: &Vec<f32>) -> Vec<f32> {
-    left_buffer.zip(right_buffer).collect::<Vec<f32>>();
+    left_buffer.zip(right_buffer).collect::<Vec<f32>>()
 }
 
 fn encode_wav(buffer: &Vec<f32>, sample_rate: f16, mono: boolean) -> Vec<u16> {
@@ -60,8 +61,22 @@ fn encode_wav(buffer: &Vec<f32>, sample_rate: f16, mono: boolean) -> Vec<u16> {
     stack.extend((buffer.len() * 2).to_le());
 
 
-    stack;
+    to_16_bit_pcm(&stack, buffer)
 }
+
+fn to_16_bit_pcm(stack: &Vec<u16>, buffer: &Vec<f32>) -> Vec<u16> {
+    for (_, input) in buffer.iter().enumerate() {
+        let s = cmp::max(-1, cmp::min(1, input));
+        if (s < 0) {
+            stack.extend((s * 0x8000).to_le());
+        } else {
+            stack.extend((s * 0x7FFF).to_le());
+        }
+    }
+
+    stack
+}
+
 
 #[no_mangle]
 pub fn export_wav(left_buffers: *mut Vec<[f32]>,
@@ -76,5 +91,5 @@ pub fn export_wav(left_buffers: *mut Vec<[f32]>,
     let right_buffer = merge_buffers(&right_slice, recording_length);
     let interleaved = interleave(&left_buffer, &right_buffer);
 
-    encode_wav(&interleaved, sample_rate, false);
+    encode_wav(&interleaved, sample_rate, false)
 }

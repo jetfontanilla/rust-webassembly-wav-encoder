@@ -65,7 +65,7 @@ fn encode_wav(buffer: &Vec<f32>, sample_rate: f16, mono: boolean) -> Vec<u16> {
 }
 
 fn to_16_bit_pcm(stack: &Vec<u16>, buffer: &Vec<f32>) -> Vec<u16> {
-    for (_, input) in buffer.iter().enumerate() {
+    for input in buffer.iter().enumerate() {
         let s = cmp::max(-1, cmp::min(1, input));
         if (s < 0) {
             stack.extend((s * 0x8000).to_le());

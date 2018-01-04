@@ -12,13 +12,61 @@ fn interleave(left_buffer: &Vec<f32>, right_buffer: &Vec<f32>) -> Vec<f32> {
     left_buffer.zip(right_buffer).collect::<Vec<f32>>();
 }
 
-fn encode_wav(buffer: &Vec<f32>) -> Vec<u16> {
-    vec![];
+fn encode_wav(buffer: &Vec<f32>, sample_rate: f16, mono: boolean) -> Vec<u16> {
+    let mut stack: Vec<u16> = Vec::with_capacity(44 + buffer.len() * 2);
+
+    /* RIFF identifier */
+    stack.extend("RIFF".as_bytes());
+
+    /* file length */
+    let chunk_size = 32 + buffer.len() * 2;
+    stack.extend(chunk_size.to_le());
+
+    /* RIFF type */
+    stack.extend("WAVE".as_bytes());
+
+    /* format chunk identifier */
+    stack.extend("fmt".as_bytes());
+
+    /* format chunk length */
+    stack.extend(16.to_le());
+
+    /* sample format (raw) */
+    stack.extend(1.to_le());
+
+    /* channel count */
+    if (mono) {
+        stack.extend(1.to_le());
+    } else {
+        stack.extend(2.to_le());
+    }
+
+    /* sample rate */
+    stack.extend(sampleRate.to_le());
+
+    /* byte rate (sample rate * block align) */
+    stack.extend((sampleRate * 4).to_le());
+
+    /* block align (channel count * bytes per sample) */
+    stack.extend(4.to_le());
+
+    /* bits per sample */
+    stack.extend(16.to_le());
+
+    /* data chunk identifier */
+    stack.extend("data".as_bytes());
+
+    /* data chunk length */
+    stack.extend((buffer.len() * 2).to_le());
+
+
+    stack;
 }
 
 #[no_mangle]
 pub fn export_wav(left_buffers: *mut Vec<[f32]>,
                   right_buffers: *mut Vec<[f32]>,
+                  sample_rate: f16,
                   recording_length: usize) -> Vec<u16> {
     unsafe {
         let left_slice = slice::from_raw_parts(left_buffers, recording_length);
@@ -28,5 +76,5 @@ pub fn export_wav(left_buffers: *mut Vec<[f32]>,
     let right_buffer = merge_buffers(&right_slice, recording_length);
     let interleaved = interleave(&left_buffer, &right_buffer);
 
-    encode_wav(&interleaved);
+    encode_wav(&interleaved, sample_rate, false);
 }

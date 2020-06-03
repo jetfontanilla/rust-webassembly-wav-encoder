@@ -1,7 +1,24 @@
 # Rust to WebAssembly WAV Encoder
 
-This is current project is my current journey on diving deep into the [Rust programming language](https://www.rust-lang.org).
- 
-The aim of this project is to create WebAssembly files using the Rust compiler without using Emscripten
+WebAssembly WAV Encoder to convert raw audio and encode them to WAV files
 
-The project would use the microphone input using HTML5's getUserMedia() and passes the audio buffer to the WASM file which processes and encodes the buffer into a WAV file
+uses the [Rust programming language](https://www.rust-lang.org) with wasm-pack for generating WASM binaries
+
+# How to use
+
+install the dependency from npm
+```bash
+$ npm install wasm-wav-encoder
+```
+
+then on your JS / TypeScript files:
+
+```javascript
+import * as wasm from "wasm-wav-encoder"
+
+
+let encodedChunk = wasm.export_wav(leftBuffer, rightBuffer, sampleRate, firstChunk);
+let blob = new Blob([encodedChunk], {type: "audio/wav"});
+
+
+```

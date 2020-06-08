@@ -11,7 +11,7 @@ use js_sys::Float32Array;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-fn interleave(left_buffer: Float32Array, right_buffer: Float32Array) -> Float32Array {
+fn interleave<'a>(left_buffer: &'a Float32Array, right_buffer: &'a Float32Array) -> &'a Float32Array {
     if right_buffer.length() == 0 {
         return left_buffer;
     }
@@ -37,7 +37,7 @@ fn interleave(left_buffer: Float32Array, right_buffer: Float32Array) -> Float32A
         ctr += 1
     }
     
-    interleaved_buffer
+    &interleaved_buffer
 }
 
 fn encode_wav(interleaved_buffer: &Float32Array, sample_rate: u32, first_buffer: bool) -> DataView {
@@ -103,8 +103,8 @@ fn write_to_dataview(view: &DataView, offset: usize, string: &str) {
 
 #[wasm_bindgen]
 pub fn export_wav(
-    left_buffer: Float32Array, 
-    right_buffer: Float32Array,
+    left_buffer: &Float32Array, 
+    right_buffer: &Float32Array,
     sample_rate: u32,
     first_buffer: bool
 ) -> DataView {
